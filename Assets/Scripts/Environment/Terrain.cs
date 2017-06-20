@@ -29,7 +29,7 @@ public class Terrain : MonoBehaviour {
 			{
 				GameObject gridUnit = GameObject.Instantiate(gridUnitPrefab);
 				Transform gridUnitTransform = gridUnit.GetComponent<Transform> ();
-				gridUnitTransform.position = new Vector3 (x*2.01f,0,y*2.01f);
+				gridUnitTransform.position = new Vector3 (x*2.1f,0,y*2.1f);
 			}				
 		}			
 	}

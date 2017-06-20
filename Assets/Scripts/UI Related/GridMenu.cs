@@ -1,34 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
+
 
 public class GridMenu : MonoBehaviour
-{
-
-	public GameObject canvas;
-	public GameObject buildMenuGroup;
-
+{	
 	Camera mainCamera;
+
+	public GameObject semiCircleMenuGroup;
+	private SemiCircleMenu semiCircleMenuScript;
 
 	bool ignoreMenuCloseForMove = false;
 	bool ignoreMenuOpenForMove = false;
 
 	private GameObject selectedGridUnit;
-	bool towerMenuOpen = false;
 
-	// Use this for initialization
 	void Start ()
 	{
-
-		//get playerControl script and subscribe to events
 		mainCamera = Camera.main;
+
+		semiCircleMenuScript = semiCircleMenuGroup.GetComponent<SemiCircleMenu> ();
+
 		PlayerControl playerControl = mainCamera.GetComponent<PlayerControl> ();
 //		playerControl.longTouchEvent += LongTouchEvent;
 		playerControl.touchBeginEvent += TouchBeginEvent;
 		playerControl.touchEndEvent += TouchEndEvent;
 		playerControl.touchMovedEvent += TouchMovedEvent;
 	}
-	
+
+
 	// Update is called once per frame
 	void Update ()
 	{
@@ -37,11 +39,11 @@ public class GridMenu : MonoBehaviour
 
 	void TouchMovedEvent(Vector3 position)
 	{
-		if (towerMenuOpen) {
+		if (semiCircleMenuScript.isOpen) {
 			ignoreMenuCloseForMove = true;
 
 			//update menu position
-			RectTransform transform = buildMenuGroup.GetComponent<RectTransform> ();
+			RectTransform transform = this.GetComponent<RectTransform> ();
 			transform.position = mainCamera.WorldToScreenPoint (selectedGridUnit.transform.position);
 		}
 		else 
@@ -63,11 +65,11 @@ public class GridMenu : MonoBehaviour
 	void TouchEndEvent (Vector3 position)
 	{
 		
-		if (towerMenuOpen /*&& touch is not within option*/) {
+		if (semiCircleMenuScript.isOpen /*&& touch is not within option*/) {
 
 			if(!ignoreMenuCloseForMove)
 			{
-				CloseTowerMenu ();
+				Close ();
 			}
 
 		} 
@@ -79,38 +81,43 @@ public class GridMenu : MonoBehaviour
 			Physics.Raycast (ray, out hitCast);
 
 			//set selected grid
-			selectedGridUnit = hitCast.collider.gameObject;
-			OpenTowerMenu ();
+
+			if(hitCast.collider != null && hitCast.collider.gameObject != null)
+			{
+				selectedGridUnit = hitCast.collider.gameObject;
+				Open ();
+			}
+
 		}
 
 	}
 
-	void OpenTowerMenu ()
+	void Open ()
 	{
 		if(selectedGridUnit == null){print ("no selected grid unit");return;}
 
 		if(ignoreMenuOpenForMove){return;}
 
-		towerMenuOpen = true;
-
 		selectedGridUnit.GetComponent<Renderer> ().material.color = Color.blue;
 
 		//Show Menu UI 
-		RectTransform transform = buildMenuGroup.GetComponent<RectTransform> ();
-		transform.position = mainCamera.WorldToScreenPoint(selectedGridUnit.transform.position);
+		semiCircleMenuScript.Open(selectedGridUnit.transform.position);
 	}
 
-	void CloseTowerMenu ()
+	void Close ()
 	{
-		towerMenuOpen = false;
-
 		selectedGridUnit.GetComponent<Renderer> ().material.color = Color.white;
 
 		selectedGridUnit = null;
 
 		//Hide Menu UI
-		RectTransform transform = buildMenuGroup.GetComponent<RectTransform> ();
-		transform.position = new Vector3 (-100,-100,-100);
+		semiCircleMenuScript.Close();
 	}
+
+	void MenuButtonClicked(int index)
+	{
+		print (index.ToString() + " clicked");
+	}
+
 
 }

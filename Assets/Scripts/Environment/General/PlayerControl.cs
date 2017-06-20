@@ -6,6 +6,7 @@ public class PlayerControl : MonoBehaviour {
 
 	Camera camera;
 	private float mouseDownTime = 0;
+	private Vector3 lastTouchPosition;
 
 	public delegate void PlayerControlDelegate(Vector3 information);
 	public PlayerControlDelegate longTouchEvent;
@@ -28,12 +29,14 @@ public class PlayerControl : MonoBehaviour {
 		if (Input.GetMouseButton (0)) {
 
 			//check for touch movement
-			if(Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 )
+			if(lastTouchPosition != Input.mousePosition)
 			{
 				if(touchMovedEvent != null)
 				{
 					touchMovedEvent (Input.mousePosition);				
 				}
+
+				lastTouchPosition = Input.mousePosition;
 			}
 
 
