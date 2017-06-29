@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9e3cc4da39b0540dab41c8373364c526
+timeCreated: 1498640556
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - buttonPrefab: {fileID: 1924120435664500, guid: ecbeeee87030c4d90b1264ca90d959eb,
+      type: 2}
+  - menuUIObject: {instanceID: 0}
+  - mainCellPanel: {instanceID: 0}
+  - mainTabPanel: {instanceID: 0}
+  - closeMenuButton: {instanceID: 0}
+  - selectedGridUnit: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

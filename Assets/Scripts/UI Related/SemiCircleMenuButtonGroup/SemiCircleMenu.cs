@@ -3,52 +3,85 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 
 
 public class SemiCircleMenu : MonoBehaviour
-{	
-	public delegate void MenuButtonDelegate(int index);
-	public MenuButtonDelegate menuButtonPressed;
+{
+	public delegate void MenuButtonDelegate (int index);
+
+	public MenuButtonDelegate menuButtonDown;
+	public MenuButtonDelegate menuButtonUp;
 
 	public GameObject buttonPrefab;
 	public Sprite[] buttonImages;
 	public float buttonDistanceFromCenter;
+	public float buttonHeight;
 
 	public bool isOpen = false;
 
-	void Awake()
+	void Awake ()
 	{
 
-		float angleBetweenButtons = Mathf.PI/ buttonImages.Length;
+		float angleBetweenButtons = Mathf.PI / buttonImages.Length;
 
-		for(int i = 0; i < buttonImages.Length; i++)
-		{
-			float thisButtonAngle = (i - (buttonImages.Length-1)/2) * angleBetweenButtons;
-			float x = Mathf.Cos (thisButtonAngle + Mathf.PI/2) * buttonDistanceFromCenter;
-			float y = Mathf.Sin (thisButtonAngle + Mathf.PI/2) * buttonDistanceFromCenter;
+		for (int i = 0; i < buttonImages.Length; i++) {
+
+			//get coordinates for spawn
+			float thisButtonAngle = (i - (buttonImages.Length - 1) / 2) * angleBetweenButtons;
+			float x = Mathf.Cos (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter;
+			float y = Mathf.Sin (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter;
+
+			//spawn
+			GameObject newButton = GameObject.Instantiate (buttonPrefab, new Vector3 (0, 0, 0), Quaternion.identity, this.transform);
+			newButton.transform.localPosition = new Vector3 (x, y, 0);
+
+			int index = i;
 
 
-			Sprite image = buttonImages[i];
-			GameObject newButton = GameObject.Instantiate(buttonPrefab,new Vector3(0,0,0),Quaternion.identity,this.transform);
+			//get or add eventTriggerScript to each button
+			EventTrigger eventTriggerScript = newButton.GetComponent<EventTrigger> ();
+			if (eventTriggerScript == null) {
+				eventTriggerScript = newButton.AddComponent<EventTrigger> ();
+			}
 
-			newButton.transform.localPosition = new Vector3 (x,y,0);
-			print ("creating button");
 
+			#region menu button trigger callbacks:
+
+			//event trigger down
+			EventTrigger.Entry pointerDown = new EventTrigger.Entry ();
+			pointerDown.eventID = EventTriggerType.PointerDown;
+			pointerDown.callback.AddListener ((eventData) => {
+				MenuButtonDown (index);
+			});
+
+			//event trigger up
+			EventTrigger.Entry pointerUp = new EventTrigger.Entry ();
+			pointerUp.eventID = EventTriggerType.PointerUp;
+			pointerUp.callback.AddListener ((eventData) => {
+				MenuButtonUp (index);
+			});
+
+
+			eventTriggerScript.triggers.Add (pointerDown);
+			eventTriggerScript.triggers.Add (pointerUp);
+
+			#endregion
+
+			#region set button image
 			Button buttonScript = newButton.GetComponent<Button> ();
-			if (buttonScript != null)
-			{
+			if (buttonScript != null) {
+				//change button image
+				Sprite image = buttonImages [i];
 				buttonScript.image.sprite = image;
-				buttonScript.onClick.AddListener (delegate{MenuButtonClicked(i);}); 
-
-				//buttonScript.onClick = Start;
+			} else {
+				print ("no button script");
 			}
-			else
-			{
-				print("no button script");
-			}
+			#endregion
 		}
 	}
+
 
 
 	public void Open (Vector3 worldPointPosition)
@@ -57,7 +90,9 @@ public class SemiCircleMenu : MonoBehaviour
 
 		//Show Menu UI 
 		RectTransform transform = this.GetComponent<RectTransform> ();
-		transform.position = Camera.main.WorldToScreenPoint(worldPointPosition);
+		transform.position = Camera.main.WorldToScreenPoint (worldPointPosition);
+
+		OnOpened ();
 	}
 
 	public void Close ()
@@ -66,13 +101,47 @@ public class SemiCircleMenu : MonoBehaviour
 
 		//Hide Menu UI
 		RectTransform transform = this.GetComponent<RectTransform> ();
-		transform.position = new Vector3 (-1000,-1000,-100);
+		transform.position = new Vector3 (-1000, -1000, -100);
+
+		OnClosed ();
 	}
 
-	void MenuButtonClicked(int index)
+	public abstract void OnOpened ();
+
+	public abstract void OnClosed ();
+
+	public abstract void DidPressMenuItem (int index);
+
+	public abstract void DidReleaseMenuItem (int index);
+
+	public void MoveToWorldPosition (Vector3 destination)
 	{
-		menuButtonPressed (index);
+		RectTransform transform = this.GetComponent<RectTransform> ();
+		transform.position = Camera.main.WorldToScreenPoint (destination);
 	}
+
+	public void MoveToScreenPosition (Vector3 destination)
+	{
+		RectTransform transform = this.GetComponent<RectTransform> ();
+		transform.position = destination;
+	}
+
+
+	void MenuButtonDown (int index)
+	{
+		if (menuButtonDown != null) {
+			menuButtonDown (index);		
+		}
+	}
+
+	void MenuButtonUp (int index)
+	{		
+		if (menuButtonUp != null) {
+			menuButtonUp (index);		
+		}
+	}
+
+
 
 
 }

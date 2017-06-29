@@ -46,14 +46,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\CameraMovement.cs" />
-     <Compile Include="Assets\Scripts\Environment\General\Interactable.cs" />
-     <Compile Include="Assets\Scripts\Environment\General\PlayerControl.cs" />
-     <Compile Include="Assets\Scripts\Environment\GridUnit.cs" />
-     <Compile Include="Assets\Scripts\Environment\Main.cs" />
-     <Compile Include="Assets\Scripts\Environment\Terrain.cs" />
+     <Compile Include="Assets\Moveable.cs" />
+     <Compile Include="Assets\Scripts\General\Interactable.cs" />
+     <Compile Include="Assets\Scripts\Map\GridManager.cs" />
+     <Compile Include="Assets\Scripts\Map\GridUnit.cs" />
+     <Compile Include="Assets\Scripts\Map\Main.cs" />
+     <Compile Include="Assets\Scripts\PlayerControl\CameraMovement.cs" />
+     <Compile Include="Assets\Scripts\PlayerControl\PlayerControl.cs" />
      <Compile Include="Assets\Scripts\UI Related\GridMenu.cs" />
      <Compile Include="Assets\Scripts\UI Related\SemiCircleMenuButtonGroup\SemiCircleMenu.cs" />
+     <Compile Include="Assets\Scripts\UI Related\ShopMenu.cs" />
+     <Compile Include="Assets\Scripts\UI Related\TabListMenu\TabListMenu.cs" />
      <Compile Include="Assets\UICanvasScript.cs" />
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>

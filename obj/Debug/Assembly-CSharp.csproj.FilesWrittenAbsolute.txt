@@ -16,3 +16,7 @@
 /Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/Temp/bin/Debug/Assembly-CSharp.dll.mdb
+/Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/Temp/bin/Debug/Assembly-CSharp.dll
+/Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/obj/Debug/Assembly-CSharp.dll
+/Users/elliotmoose/Desktop/Programming/Projects/LegionTD/LegionTD/obj/Debug/Assembly-CSharp.dll.mdb
