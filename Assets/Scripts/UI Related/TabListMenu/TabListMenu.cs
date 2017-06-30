@@ -28,7 +28,7 @@ public abstract class TabListMenu : MonoBehaviour
 	{
 		//spawn menu object - horizontal layout
 		menuUIObject = GameObject.Instantiate (new GameObject ("tabListMenuGroup"), gameObject.transform); 
-		CanvasRenderer renderer = menuUIObject.AddComponent <CanvasRenderer> ();
+		menuUIObject.AddComponent <CanvasRenderer> ();
 		menuUIObject.AddComponent<Image> ();
 		menuUIObject.AddComponent<VerticalLayoutGroup> ().padding.left = 1;
 		RectTransform rect = menuUIObject.GetComponent <RectTransform> ();
@@ -39,7 +39,6 @@ public abstract class TabListMenu : MonoBehaviour
 		rect.offsetMax = new Vector2 (0, rect.offsetMax.y);
 		rect.offsetMin = new Vector2 (0, 0);
 		rect.SetSizeWithCurrentAnchors (RectTransform.Axis.Vertical, menuHeight ());
-
 
 		//spawn close button
 		closeMenuButton = GameObject.Instantiate (new GameObject ("closeMenuButton"), menuUIObject.transform); 
@@ -52,7 +51,7 @@ public abstract class TabListMenu : MonoBehaviour
 		//spawn mainTabPanel - vertical layout
 		mainTabPanel = GameObject.Instantiate (new GameObject ("mainTabPanel"), menuUIObject.transform); 
 		InitUIElement (mainTabPanel);
-		HorizontalLayoutGroup mainTabPanelHorizontalLayout = mainTabPanel.AddComponent<HorizontalLayoutGroup> ();
+		mainTabPanel.AddComponent<HorizontalLayoutGroup> ();
 		mainTabPanel.GetComponent<Image> ().color = Color.gray;
 		mainTabPanel.AddComponent<LayoutElement> ().preferredHeight = tabHeight ();
 

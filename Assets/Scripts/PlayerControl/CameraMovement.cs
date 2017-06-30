@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraMovement : MonoBehaviour
 {
@@ -19,15 +20,9 @@ public class CameraMovement : MonoBehaviour
 		PlayerControl playerControl = this.GetComponent<PlayerControl> ();
 		playerControl.touchMovedEvent += TouchMovedEvent;
 		playerControl.touchEndEvent += TouchEndEvent;
-		playerControl.touchZoomEvent += TouchZoomEvent;
+		playerControl.touchZoomEvent += ZoomCamera;
 
 
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		
 	}
 
 	void TouchMovedEvent (Vector3 position)
@@ -37,7 +32,12 @@ public class CameraMovement : MonoBehaviour
 			return;
 		} 
 
+		//check for ui penetration
+
 		//need to move camera with same amount as moved on the ground
+		if (EventSystem.current.IsPointerOverGameObject () || EventSystem.current.currentSelectedGameObject != null) {	
+			return;
+		}
 
 		//get old and new touch position
 		if (oldTouchPosition == new Vector3 (0, 0, 0)) {
@@ -63,13 +63,11 @@ public class CameraMovement : MonoBehaviour
 		oldTouchPosition = new Vector3 (0, 0, 0);
 	}
 
-	void TouchZoomEvent (Vector3 info)
+	void ZoomCamera (Vector3 info)
 	{		
 		Vector3 postulatedPosition = this.transform.position + info * zoomFactor;
 		if (postulatedPosition.y > lowerUpperLimit && postulatedPosition.y < heightUpperLimit) {
 			this.transform.position = postulatedPosition;
 		}
-
-
 	}
 }

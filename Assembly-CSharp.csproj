@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Moveable.cs" />
-     <Compile Include="Assets\Scripts\General\Interactable.cs" />
      <Compile Include="Assets\Scripts\Map\GridManager.cs" />
      <Compile Include="Assets\Scripts\Map\GridUnit.cs" />
      <Compile Include="Assets\Scripts\Map\Main.cs" />

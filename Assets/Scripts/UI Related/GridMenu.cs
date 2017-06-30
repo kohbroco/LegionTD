@@ -7,49 +7,61 @@ using UnityEngine.EventSystems;
 
 
 
-public class GridMenu : MonoBehaviour
+public class GridMenu : SemiCircleMenu
 {
-	Camera mainCamera;
+	public List<Sprite> buttonImages = new List<Sprite> ();
 
-	public GameObject semiCircleMenuGroup;
-	private SemiCircleMenu semiCircleMenuScript;
-
-	bool ignoreMenuClose = false;
-	bool ignoreMenuOpen = false;
-
+	//runtime references
+	private Camera mainCamera;
 	private GridUnit selectedGridUnit;
 	private GridUnit proposedMoveToGridUnit;
 
+	//runtime variables
+	bool ignoreMenuClose = false;
+	bool ignoreMenuOpen = false;
 	bool isMovingTower = false;
 
 	void Start ()
 	{
 		mainCamera = Camera.main;
 
-		semiCircleMenuScript = semiCircleMenuGroup.GetComponent<SemiCircleMenu> ();
-		semiCircleMenuScript.menuButtonUp += menuButtonUp;
-		semiCircleMenuScript.menuButtonDown += menuButtonDown;
-
 		PlayerControl playerControl = mainCamera.GetComponent<PlayerControl> ();
 		playerControl.touchBeginEvent += TouchBeginEvent;
 		playerControl.touchEndEvent += TouchEndEvent;
 		playerControl.touchMovedEvent += TouchMovedEvent;
-
-
-
 	}
 
+	#region init functions (appearance of menu)
 
-	// Update is called once per frame
-	void Update ()
+	//init abstract class functions
+	public override float buttonDistanceFromCenter ()
 	{
-		
+		return 140;
 	}
+
+	public override float buttonHeight ()
+	{
+		return 140;
+	}
+
+	public override int NumberOfButtons ()
+	{
+		return buttonImages.Count;
+	}
+
+	public override Sprite ImageForButtonAtIndex (int index)
+	{
+		return buttonImages [index];
+	}
+
+	#endregion
+
+	#region touch control (Grid selection,menu open/close triggers)
 
 	void TouchMovedEvent (Vector3 position)
 	{
 		//if menu is open when touch is moved
-		if (semiCircleMenuScript.isOpen) {
+		if (this.isOpen) {
 			ignoreMenuClose = true;
 
 			if (isMovingTower) {
@@ -57,7 +69,7 @@ public class GridMenu : MonoBehaviour
 				ProposeTowerAtScreenPosition (position);
 
 			} else {
-				semiCircleMenuScript.MoveToWorldPosition (selectedGridUnit.transform.position);
+				this.MoveMenuToWorldPosition (selectedGridUnit.transform.position);
 			}
 
 		} else {
@@ -75,7 +87,7 @@ public class GridMenu : MonoBehaviour
 	{		
 		
 			
-		if (semiCircleMenuScript.isOpen /*&& touch is not within option*/) {
+		if (this.isOpen /*&& touch is not within option*/) {
 
 			if (!ignoreMenuClose) {
 				CloseMenu ();
@@ -98,42 +110,9 @@ public class GridMenu : MonoBehaviour
 		}			
 	}
 
-	#region retrieve grid unit by position
-
-	GridUnit GetGridUnitFromScreenPosition (Vector3 position)
-	{
-		//ray cast
-		Ray ray = Camera.main.ScreenPointToRay (position);	
-		RaycastHit hitCast;
-		Physics.Raycast (ray, out hitCast);
-
-		//return grid unit hit
-		if (hitCast.collider != null && hitCast.collider.gameObject != null) {
-
-			return hitCast.collider.gameObject.GetComponent<GridUnit> ();
-		} else {
-			return null;
-		}
-	}
-
-	GridUnit GetGridUnitFromWorldPosition (Vector3 position)
-	{
-		//ray cast
-		Ray ray = new Ray (Vector3.zero, position);
-		RaycastHit hitCast;
-		Physics.Raycast (ray, out hitCast);
-
-		//return grid unit hit
-		if (hitCast.collider != null && hitCast.collider.gameObject != null) {
-			return hitCast.collider.gameObject.GetComponent<GridUnit> ();
-		} else {
-			return null;
-		}
-	}
-
 	#endregion
 
-	#region menu events
+	#region menu methods (open,closing,onclick)
 
 	void OpenMenu ()
 	{
@@ -143,7 +122,7 @@ public class GridMenu : MonoBehaviour
 			return;
 		}
 
-		//check to ignore (when moving)
+		//check to ignore (e.g when moving)
 		if (ignoreMenuOpen) {
 			return;
 		}
@@ -155,29 +134,30 @@ public class GridMenu : MonoBehaviour
 			shop.Close ();
 		}
 
-
+		//update grid appearance
 		selectedGridUnit.Select (Color.blue);
 
 		//Show Menu UI 
-		semiCircleMenuScript.Open (selectedGridUnit.gameObject.transform.position);
+		Open (selectedGridUnit.gameObject.transform.position);
 	}
 
 	void CloseMenu ()
 	{
+		//reset selection of grid unit
 		selectedGridUnit.Deselect ();
-
 		selectedGridUnit = null;
 
 		//Hide Menu UI
-		semiCircleMenuScript.Close ();
+		Close ();
 	}
 
 
-	void menuButtonUp (int index)
+	public override void DidReleaseMenuItem (int index)
 	{
 		switch (index) {
 		case 0:
 			{
+				//open the shop
 				ShopMenu shop = gameObject.GetComponent<ShopMenu> ();
 				shop.selectedGridUnit = selectedGridUnit;
 				CloseMenu ();
@@ -188,12 +168,9 @@ public class GridMenu : MonoBehaviour
 			}
 		case 1:
 			{
-				print ("moving tower end");
-
+				//end tower movement
 				isMovingTower = false;
-
 				StartCameraMovement ();
-
 				MoveTowerToProposedUnit ();
 
 				break;
@@ -201,22 +178,18 @@ public class GridMenu : MonoBehaviour
 
 		case 2:
 			{
-				print ("deleting!");
-
+				//removing tower
 				break;
 			}
 		}
 	}
 
-	void menuButtonDown (int index)
+	public override void DidPressMenuItem (int index)
 	{
-		//1 is the move index
+		//begin tower movement
 		if (index == 1) {
-			print ("moving tower begin");
 			isMovingTower = true;
-
 			StopCameraMovement ();
-
 		}
 
 
@@ -229,7 +202,7 @@ public class GridMenu : MonoBehaviour
 	private void ProposeTowerAtScreenPosition (Vector3 position)
 	{
 		//Step 1: Move menu to touch
-		semiCircleMenuScript.MoveToScreenPosition (new Vector3 (position.x, position.y - semiCircleMenuScript.buttonDistanceFromCenter * 0.6f, position.z));
+		MoveMenuToScreenPosition (new Vector3 (position.x, position.y - buttonDistanceFromCenter () * 0.6f, position.z));
 
 		//Step 2: Reset previous proposition
 		if (proposedMoveToGridUnit != null) {
@@ -311,7 +284,7 @@ public class GridMenu : MonoBehaviour
 			return;
 		}
 
-		semiCircleMenuScript.MoveToWorldPosition (selectedGridUnit.gameObject.transform.position);
+		MoveMenuToWorldPosition (selectedGridUnit.gameObject.transform.position);
 	}
 
 	private void ResetProposedGridUnit ()
@@ -353,6 +326,41 @@ public class GridMenu : MonoBehaviour
 		camMoveScript.cameraMovementControlOn = true;
 	}
 
+
+	#endregion
+
+	#region retrieve grid unit by position
+
+	GridUnit GetGridUnitFromScreenPosition (Vector3 position)
+	{
+		//ray cast
+		Ray ray = Camera.main.ScreenPointToRay (position);	
+		RaycastHit hitCast;
+		Physics.Raycast (ray, out hitCast);
+
+		//return grid unit hit
+		if (hitCast.collider != null && hitCast.collider.gameObject != null) {
+
+			return hitCast.collider.gameObject.GetComponent<GridUnit> ();
+		} else {
+			return null;
+		}
+	}
+
+	GridUnit GetGridUnitFromWorldPosition (Vector3 position)
+	{
+		//ray cast
+		Ray ray = new Ray (Vector3.zero, position);
+		RaycastHit hitCast;
+		Physics.Raycast (ray, out hitCast);
+
+		//return grid unit hit
+		if (hitCast.collider != null && hitCast.collider.gameObject != null) {
+			return hitCast.collider.gameObject.GetComponent<GridUnit> ();
+		} else {
+			return null;
+		}
+	}
 
 	#endregion
 }

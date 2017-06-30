@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
 
-	Camera camera;
 
 	//runtime variables
 	private float mouseDownTime = 0;
@@ -28,7 +27,6 @@ public class PlayerControl : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		camera = this.GetComponent<Camera> ();
 	}
 	
 	// Update is called once per frame
@@ -83,11 +81,7 @@ public class PlayerControl : MonoBehaviour
 			Vector2 firstTouchCoordinates = Input.GetTouch (0).position;
 			Vector2 secondTouchCoordinates = Input.GetTouch (1).position;
 
-
-			Camera mainCamera = Camera.main;
-
 			float touchDistance = Vector2.Distance (firstTouchCoordinates, secondTouchCoordinates);
-			//print (touchDistance + " first: " + firstTouchWorldCoordinates.ToString () + " second: " + secondTouchWorldCoordinates.ToString ());
 
 			if (wasLastFrameZooming) {
 

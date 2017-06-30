@@ -7,34 +7,36 @@ using UnityEngine.EventSystems;
 
 
 
-public class SemiCircleMenu : MonoBehaviour
+public abstract class SemiCircleMenu : MonoBehaviour
 {
-	public delegate void MenuButtonDelegate (int index);
-
-	public MenuButtonDelegate menuButtonDown;
-	public MenuButtonDelegate menuButtonUp;
-
 	public GameObject buttonPrefab;
-	public Sprite[] buttonImages;
-	public float buttonDistanceFromCenter;
-	public float buttonHeight;
+
+
+	public GameObject semiCircleMenuGroup;
 
 	public bool isOpen = false;
 
 	void Awake ()
 	{
+		//spawn menu button group
+		semiCircleMenuGroup = GameObject.Instantiate (new GameObject (), new Vector3 (-1000, -1000, -1000), Quaternion.identity, this.transform);
+		semiCircleMenuGroup.AddComponent<RectTransform> ();
+		semiCircleMenuGroup.name = "SemiCircleMenuGroup";
 
-		float angleBetweenButtons = Mathf.PI / buttonImages.Length;
+		int noOfButtons = NumberOfButtons ();
+		float angleBetweenButtons = Mathf.PI / (noOfButtons - 1);
 
-		for (int i = 0; i < buttonImages.Length; i++) {
+		for (int i = 0; i < noOfButtons; i++) {
 
 			//get coordinates for spawn
-			float thisButtonAngle = (i - (buttonImages.Length - 1) / 2) * angleBetweenButtons;
-			float x = Mathf.Cos (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter;
-			float y = Mathf.Sin (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter;
+			float thisButtonAngle = (i - (noOfButtons - 1) / 2) * angleBetweenButtons;
+			float x = Mathf.Cos (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter ();
+			float y = Mathf.Sin (thisButtonAngle + Mathf.PI / 2) * buttonDistanceFromCenter ();
 
-			//spawn
-			GameObject newButton = GameObject.Instantiate (buttonPrefab, new Vector3 (0, 0, 0), Quaternion.identity, this.transform);
+			//spawn menu button
+			GameObject newButton = GameObject.Instantiate (buttonPrefab, new Vector3 (0, 0, 0), Quaternion.identity, semiCircleMenuGroup.transform);
+			newButton.GetComponent<RectTransform> ().SetSizeWithCurrentAnchors (RectTransform.Axis.Vertical, buttonHeight ());
+			newButton.GetComponent<RectTransform> ().SetSizeWithCurrentAnchors (RectTransform.Axis.Horizontal, buttonHeight ());
 			newButton.transform.localPosition = new Vector3 (x, y, 0);
 
 			int index = i;
@@ -53,14 +55,14 @@ public class SemiCircleMenu : MonoBehaviour
 			EventTrigger.Entry pointerDown = new EventTrigger.Entry ();
 			pointerDown.eventID = EventTriggerType.PointerDown;
 			pointerDown.callback.AddListener ((eventData) => {
-				MenuButtonDown (index);
+				DidPressMenuItem (index);
 			});
 
 			//event trigger up
 			EventTrigger.Entry pointerUp = new EventTrigger.Entry ();
 			pointerUp.eventID = EventTriggerType.PointerUp;
 			pointerUp.callback.AddListener ((eventData) => {
-				MenuButtonUp (index);
+				DidReleaseMenuItem (index);
 			});
 
 
@@ -73,7 +75,7 @@ public class SemiCircleMenu : MonoBehaviour
 			Button buttonScript = newButton.GetComponent<Button> ();
 			if (buttonScript != null) {
 				//change button image
-				Sprite image = buttonImages [i];
+				Sprite image = ImageForButtonAtIndex (i);
 				buttonScript.image.sprite = image;
 			} else {
 				print ("no button script");
@@ -89,7 +91,7 @@ public class SemiCircleMenu : MonoBehaviour
 		isOpen = true;
 
 		//Show Menu UI 
-		RectTransform transform = this.GetComponent<RectTransform> ();
+		RectTransform transform = semiCircleMenuGroup.GetComponent<RectTransform> ();
 		transform.position = Camera.main.WorldToScreenPoint (worldPointPosition);
 
 		OnOpened ();
@@ -100,45 +102,46 @@ public class SemiCircleMenu : MonoBehaviour
 		isOpen = false;
 
 		//Hide Menu UI
-		RectTransform transform = this.GetComponent<RectTransform> ();
+		RectTransform transform = semiCircleMenuGroup.GetComponent<RectTransform> ();
 		transform.position = new Vector3 (-1000, -1000, -100);
 
 		OnClosed ();
 	}
 
-	public abstract void OnOpened ();
+	public void MoveMenuToWorldPosition (Vector3 destination)
+	{
+		RectTransform menuTransform = semiCircleMenuGroup.GetComponent<RectTransform> ();
+		menuTransform.position = Camera.main.WorldToScreenPoint (destination);
+	}
 
-	public abstract void OnClosed ();
+	public void MoveMenuToScreenPosition (Vector3 destination)
+	{
+		RectTransform menuTransform = semiCircleMenuGroup.GetComponent<RectTransform> ();
+		menuTransform.position = destination;
+	}
+
+
+	public abstract int NumberOfButtons ();
+
+	public abstract Sprite ImageForButtonAtIndex (int index);
+
+
+	public abstract float buttonDistanceFromCenter ();
+
+	public abstract float buttonHeight ();
+
 
 	public abstract void DidPressMenuItem (int index);
 
 	public abstract void DidReleaseMenuItem (int index);
 
-	public void MoveToWorldPosition (Vector3 destination)
+
+	public virtual void OnOpened ()
 	{
-		RectTransform transform = this.GetComponent<RectTransform> ();
-		transform.position = Camera.main.WorldToScreenPoint (destination);
 	}
 
-	public void MoveToScreenPosition (Vector3 destination)
+	public virtual void OnClosed ()
 	{
-		RectTransform transform = this.GetComponent<RectTransform> ();
-		transform.position = destination;
-	}
-
-
-	void MenuButtonDown (int index)
-	{
-		if (menuButtonDown != null) {
-			menuButtonDown (index);		
-		}
-	}
-
-	void MenuButtonUp (int index)
-	{		
-		if (menuButtonUp != null) {
-			menuButtonUp (index);		
-		}
 	}
 
 
