@@ -7,7 +7,7 @@ public class GridUnit : MonoBehaviour
 	public Vector2 gridCoordinate;
 	public GameObject currentTowerObject;
 
-
+	private Color defaultColor = Color.white;
 	// Use this for initialization
 	void Start ()
 	{
@@ -28,7 +28,7 @@ public class GridUnit : MonoBehaviour
 
 	public void Deselect ()
 	{
-		gameObject.GetComponent<Renderer> ().material.color = Color.white;
+		gameObject.GetComponent<Renderer> ().material.color = defaultColor;
 	}
 
 	public void SetCurrentTowerObject (GameObject towerToSet)
@@ -40,5 +40,12 @@ public class GridUnit : MonoBehaviour
 	{
 		currentTowerObject = null;	
 	}
+
+	public void SetDefaultColor (Color color)
+	{
+		defaultColor = color;
+		gameObject.GetComponent<Renderer> ().material.color = color;
+	}
+
 
 }

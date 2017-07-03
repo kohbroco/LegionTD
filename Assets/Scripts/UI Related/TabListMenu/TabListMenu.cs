@@ -47,6 +47,7 @@ public abstract class TabListMenu : MonoBehaviour
 		closeMenuButtonLayoutElement.minHeight = 20f;
 		closeMenuButtonLayoutElement.preferredHeight = 20f;
 		closeMenuButton.AddComponent<Button> ().onClick.AddListener (Close);
+		closeMenuButton.AddComponent<Shadow> ().effectDistance = new Vector2 (1, 5);
 
 		//spawn mainTabPanel - vertical layout
 		mainTabPanel = GameObject.Instantiate (new GameObject ("mainTabPanel"), menuUIObject.transform); 
